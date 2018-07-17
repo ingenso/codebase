@@ -1,0 +1,18 @@
+[
+    {
+        "id": "ac0f3e9a.9f53",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "LRS Simple",
+        "func": "var str = msg.payload;\n\nvar res = str.toString().split(\",\");\nvar message = res[3];\nvar clean = message.replace(/\\n$/, \"\")\nvar parts = clean.split(\"-\")\n\n\n\nmsg.address = res[2];\nmsg.loc =  parts[1];\nmsg.message = parts[0];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 660,
+        "wires": [
+            [
+                "d3d7eaef.5ebaf8"
+            ]
+        ]
+    }
+]
