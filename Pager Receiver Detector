@@ -1,0 +1,18 @@
+[
+    {
+        "id": "ff93cb53.933708",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "Autodetect Type",
+        "func": "var str = msg.payload;\n\n\ntry {\n   \n\nvar res = str.split(\",\");\nmsg.payload = res;\nif (res[0] == \"RECV\") {\n    context.global.pager = \"LRS\";\n    msg.pager = \"LRS\";\n}\n\n}\n\ncatch(err) {\n context.global.pager = \"NRS\";\n msg.pager = \"NRS\";\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 680,
+        "wires": [
+            [
+                "4e8326e7.77dc18"
+            ]
+        ]
+    }
+]
