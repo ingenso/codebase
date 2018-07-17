@@ -1,0 +1,18 @@
+[
+    {
+        "id": "6993c9bc.d340c8",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "NRS Simple",
+        "func": "var buffer = new Buffer(msg.payload);\nvar message = buffer.toString('utf-8');\nvar length = message.length - 1;\nvar page = message.substring(2,length);\nvar parts = page.split(\"-\");\n\n\nmsg.loc = parts[1];\nmsg.message = parts[0];\n\nvar address = msg.payload[1];\nswitch(address) {\n    case 131:\n        msg.pager = 1;\n        break;\n    case 135:\n        msg.pager = 2;\n        break;\n    case 139:\n        msg.pager = 3;\n        break;\n    case 143:\n        msg.pager = 4;\n        break;\n    case 147:\n        msg.pager = 5;\n        break;\n    case 151:\n        msg.pager = 6;\n        break;\n    case 155:\n        msg.pager = 7;\n        break;\n    case 159:\n        msg.pager = 8;\n        break;\n    default:\n      msg.pager = null;\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 700,
+        "wires": [
+            [
+                "6755e84f.bd2b18"
+            ]
+        ]
+    }
+]
