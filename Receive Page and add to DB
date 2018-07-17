@@ -1,0 +1,286 @@
+[
+    {
+        "id": "2a04a83c.928778",
+        "type": "serial in",
+        "z": "51559581.3612cc",
+        "name": "",
+        "serial": "2c26ad18.3ad492",
+        "x": 90,
+        "y": 680,
+        "wires": [
+            [
+                "ff93cb53.933708"
+            ]
+        ]
+    },
+    {
+        "id": "6755e84f.bd2b18",
+        "type": "switch",
+        "z": "51559581.3612cc",
+        "name": "Filter Blanks",
+        "property": "pager",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 850,
+        "y": 680,
+        "wires": [
+            [
+                "3f72c334.087a2c"
+            ]
+        ]
+    },
+    {
+        "id": "451fb637.4431a8",
+        "type": "template",
+        "z": "51559581.3612cc",
+        "name": "",
+        "field": "topic",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "INSERT INTO `nodered`.`message` (`loc`, `message`) VALUES ( '{{loc}}', '{{message}}');",
+        "output": "str",
+        "x": 1220,
+        "y": 680,
+        "wires": [
+            [
+                "a6e98801.6d7668"
+            ]
+        ]
+    },
+    {
+        "id": "a6e98801.6d7668",
+        "type": "mysql",
+        "z": "51559581.3612cc",
+        "mydb": "fadad15.093f03",
+        "name": "",
+        "x": 1360,
+        "y": 680,
+        "wires": [
+            [
+                "50df4d3.a9d01b4"
+            ]
+        ]
+    },
+    {
+        "id": "97c75276.ec67c",
+        "type": "inject",
+        "z": "51559581.3612cc",
+        "name": "LRS",
+        "topic": "",
+        "payload": "RECV,4,0707288,Water Refill-Table. 1",
+        "payloadType": "str",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 720,
+        "wires": [
+            [
+                "ff93cb53.933708"
+            ]
+        ]
+    },
+    {
+        "id": "3f72c334.087a2c",
+        "type": "switch",
+        "z": "51559581.3612cc",
+        "name": "Stop Repeat Pushes",
+        "property": "message",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "",
+                "vt": "prev"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1040,
+        "y": 680,
+        "wires": [
+            [
+                "451fb637.4431a8"
+            ]
+        ]
+    },
+    {
+        "id": "f4d21182.3e536",
+        "type": "comment",
+        "z": "51559581.3612cc",
+        "name": "Swap Depending on Receiver Used",
+        "info": "",
+        "x": 340,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "4c5f9199.25325",
+        "type": "comment",
+        "z": "51559581.3612cc",
+        "name": "Receive Page and Add to DB",
+        "info": "",
+        "x": 140,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "6993c9bc.d340c8",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "NRS Simple",
+        "func": "var buffer = new Buffer(msg.payload);\nvar message = buffer.toString('utf-8');\nvar length = message.length - 1;\nvar page = message.substring(2,length);\nvar parts = page.split(\"-\");\n\n\nmsg.loc = parts[1];\nmsg.message = parts[0];\n\nvar address = msg.payload[1];\nswitch(address) {\n    case 131:\n        msg.pager = 1;\n        break;\n    case 135:\n        msg.pager = 2;\n        break;\n    case 139:\n        msg.pager = 3;\n        break;\n    case 143:\n        msg.pager = 4;\n        break;\n    case 147:\n        msg.pager = 5;\n        break;\n    case 151:\n        msg.pager = 6;\n        break;\n    case 155:\n        msg.pager = 7;\n        break;\n    case 159:\n        msg.pager = 8;\n        break;\n    default:\n      msg.pager = null;\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 700,
+        "wires": [
+            [
+                "6755e84f.bd2b18"
+            ]
+        ]
+    },
+    {
+        "id": "ac0f3e9a.9f53",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "LRS Simple",
+        "func": "var str = msg.payload;\n\nvar res = str.toString().split(\",\");\nvar message = res[3];\nvar clean = message.replace(/\\n$/, \"\")\nvar parts = clean.split(\"-\")\n\n\n\nmsg.address = res[2];\nmsg.loc =  parts[1];\nmsg.message = parts[0];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 570,
+        "y": 660,
+        "wires": [
+            [
+                "d3d7eaef.5ebaf8"
+            ]
+        ]
+    },
+    {
+        "id": "4e8326e7.77dc18",
+        "type": "switch",
+        "z": "51559581.3612cc",
+        "name": "",
+        "property": "pager",
+        "propertyType": "global",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "LRS",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "NRS",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 430,
+        "y": 680,
+        "wires": [
+            [
+                "ac0f3e9a.9f53"
+            ],
+            [
+                "6993c9bc.d340c8"
+            ]
+        ]
+    },
+    {
+        "id": "d3d7eaef.5ebaf8",
+        "type": "switch",
+        "z": "51559581.3612cc",
+        "name": "",
+        "property": "address",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "sysAdd",
+                "vt": "global"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 710,
+        "y": 660,
+        "wires": [
+            [
+                "6755e84f.bd2b18"
+            ]
+        ]
+    },
+    {
+        "id": "ff93cb53.933708",
+        "type": "function",
+        "z": "51559581.3612cc",
+        "name": "Autodetect Type",
+        "func": "var str = msg.payload;\n\n\ntry {\n   \n\nvar res = str.split(\",\");\nmsg.payload = res;\nif (res[0] == \"RECV\") {\n    context.global.pager = \"LRS\";\n    msg.pager = \"LRS\";\n}\n\n}\n\ncatch(err) {\n context.global.pager = \"NRS\";\n msg.pager = \"NRS\";\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 280,
+        "y": 680,
+        "wires": [
+            [
+                "4e8326e7.77dc18"
+            ]
+        ]
+    },
+    {
+        "id": "fa8930b6.aaa4a",
+        "type": "inject",
+        "z": "51559581.3612cc",
+        "name": "NRS",
+        "topic": "",
+        "payload": "[29,131,87,97,116,101,114,32,82,101,102,105,108,108,45,84,97,98,108,101,46,32,49,26]",
+        "payloadType": "bin",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 110,
+        "y": 760,
+        "wires": [
+            [
+                "ff93cb53.933708"
+            ]
+        ]
+    },
+    {
+        "id": "2c26ad18.3ad492",
+        "type": "serial-port",
+        "z": "",
+        "serialport": "/dev/ttyUSB0",
+        "serialbaud": "9600",
+        "databits": "8",
+        "parity": "none",
+        "stopbits": "1",
+        "newline": "\\n",
+        "bin": "false",
+        "out": "char",
+        "addchar": false
+    },
+    {
+        "id": "fadad15.093f03",
+        "type": "MySQLdatabase",
+        "z": "",
+        "host": "localhost",
+        "port": "3306",
+        "db": "nodered",
+        "tz": ""
+    }
+]
